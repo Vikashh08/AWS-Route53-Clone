@@ -9,6 +9,13 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     DATABASE_URL: str = "sqlite:///./route53_clone.db"
     
+    @field_validator("DATABASE_URL", mode="before")
+    @classmethod
+    def validate_database_url(cls, v: Any) -> str:
+        if not v or not str(v).strip():
+            return "sqlite:///./route53_clone.db"
+        return str(v)
+    
     SECRET_KEY: str = "supersecretkey_please_change_in_production"
     SESSION_EXPIRY: int = 86400
     
