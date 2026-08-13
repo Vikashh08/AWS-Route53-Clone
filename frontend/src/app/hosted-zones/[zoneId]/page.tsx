@@ -3,11 +3,8 @@ import Header from '@cloudscape-design/components/header';
 import Button from '@cloudscape-design/components/button';
 import SpaceBetween from '@cloudscape-design/components/space-between';
 import DNSRecordsTable from '../../../components/DNSRecordsTable';
-import { useParams } from 'next/navigation';
-
-export default function HostedZoneDetailsPage() {
-  const params = useParams();
-  const zoneId = params.zoneId as string;
+export default async function HostedZoneDetailsPage({ params }: { params: Promise<{ zoneId: string }> }) {
+  const { zoneId } = await params;
   
   return (
     <div style={{ padding: '24px' }}>
