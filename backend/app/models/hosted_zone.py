@@ -23,4 +23,4 @@ class HostedZone(Base):
     user_id = Column(String, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     
     user = relationship("User")
-    # records = relationship("DNSRecord", back_populates="hosted_zone", cascade="all, delete-orphan")
+    records = relationship("DNSRecord", back_populates="hosted_zone", cascade="all, delete-orphan")
