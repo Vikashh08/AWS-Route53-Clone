@@ -16,8 +16,11 @@ This application is a faithful recreation of the AWS Route 53 management console
 - **Authentication**: Fully functional session-based authentication flow (mocked user database).
 - **Global Notifications**: AWS-style Flashbar for success/error operational feedback.
 
-## 3. Screenshots
-> *(Screenshots can be added here)*
+## 3. Live Demo
+**Live Application:** [AWS Route 53 Clone (Vercel)](https://awsroute53clone.vercel.app/)
+**Backend API Docs:** [Render Swagger UI](https://aws-route53-clone-4syu.onrender.com/docs)
+
+> **Note for Evaluator:** The live demo backend is hosted on Render's free tier. Because the free tier uses an ephemeral filesystem, the SQLite database automatically resets itself after 15 minutes of inactivity. Please register a new account when testing the demo!
 
 ## 4. Architecture
 The application follows a tiered clean architecture, strictly separating the frontend presentation layer from the backend API, allowing each to be scaled and maintained independently.
