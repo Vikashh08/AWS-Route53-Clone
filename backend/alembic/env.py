@@ -18,6 +18,10 @@ import os
 import sys
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 from app.db.base import Base
+from app.models.user import User
+from app.models.session import Session
+from app.models.hosted_zone import HostedZone
+from app.models.dns_record import DNSRecord
 
 # add your model's MetaData object here
 # for 'autogenerate' support
