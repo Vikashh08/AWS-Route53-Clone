@@ -2,8 +2,15 @@
 
 import * as React from 'react';
 import TopNavigation from '@cloudscape-design/components/top-navigation';
+import { usePathname } from 'next/navigation';
+import { useAuth } from '../contexts/AuthContext';
 
 export default function AppTopNavigation() {
+  const pathname = usePathname();
+  const { user, logout } = useAuth();
+  
+  if (pathname === '/login') return null;
+
   return (
     <TopNavigation
       identity={{
@@ -20,13 +27,18 @@ export default function AppTopNavigation() {
         },
         {
           type: 'menu-dropdown',
-          text: 'Demo User',
-          description: 'user@example.com',
+          text: user ? user.name : 'Demo User',
+          description: user ? user.email : 'user@example.com',
           iconName: 'user-profile',
           items: [
             { id: 'profile', text: 'Profile' },
             { id: 'signout', text: 'Sign out' }
-          ]
+          ],
+          onItemClick: (e) => {
+            if (e.detail.id === 'signout') {
+              logout();
+            }
+          }
         }
       ]}
       i18nStrings={{

@@ -6,6 +6,7 @@ import Providers from "./providers";
 import AppTopNavigation from "../components/TopNavigation";
 import Navigation from "../components/Navigation";
 import AppLayoutClient from "../components/AppLayoutClient";
+import { AuthProvider } from "../contexts/AuthContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -23,10 +24,12 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Providers>
-          <AppTopNavigation />
-          <AppLayoutClient>
-            {children}
-          </AppLayoutClient>
+          <AuthProvider>
+            <AppTopNavigation />
+            <AppLayoutClient>
+              {children}
+            </AppLayoutClient>
+          </AuthProvider>
         </Providers>
       </body>
     </html>

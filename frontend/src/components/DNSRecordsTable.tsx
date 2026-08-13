@@ -10,12 +10,14 @@ import TextFilter from '@cloudscape-design/components/text-filter';
 import Pagination from '@cloudscape-design/components/pagination';
 import { useDNSRecords } from '../hooks/useDNSRecords';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface DNSRecordsTableProps {
   zoneId: string;
 }
 
 export default function DNSRecordsTable({ zoneId }: DNSRecordsTableProps) {
+  const router = useRouter();
   const [filteringText, setFilteringText] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 20;
@@ -65,7 +67,7 @@ export default function DNSRecordsTable({ zoneId }: DNSRecordsTableProps) {
           <Box padding={{ bottom: 's' }} variant="p" color="inherit">
             Create a DNS record to get started.
           </Box>
-          <Button>Create record</Button>
+          <Button onClick={() => router.push(`/hosted-zones/${zoneId}/create-record`)}>Create record</Button>
         </Box>
       }
       filter={
@@ -83,7 +85,7 @@ export default function DNSRecordsTable({ zoneId }: DNSRecordsTableProps) {
           counter={data?.pagination ? `(${data.pagination.total})` : ''}
           actions={
             <SpaceBetween direction="horizontal" size="xs">
-              <Button variant="primary">Create record</Button>
+              <Button variant="primary" onClick={() => router.push(`/hosted-zones/${zoneId}/create-record`)}>Create record</Button>
             </SpaceBetween>
           }
         >

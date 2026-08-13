@@ -10,8 +10,10 @@ import TextFilter from '@cloudscape-design/components/text-filter';
 import Pagination from '@cloudscape-design/components/pagination';
 import { useHostedZones, HostedZone } from '../hooks/useHostedZones';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function HostedZonesTable() {
+  const router = useRouter();
   const [filteringText, setFilteringText] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const pageSize = 20;
@@ -51,7 +53,7 @@ export default function HostedZonesTable() {
           <Box padding={{ bottom: 's' }} variant="p" color="inherit">
             You don't have any hosted zones yet.
           </Box>
-          <Button>Create hosted zone</Button>
+          <Button onClick={() => router.push('/hosted-zones/create')}>Create hosted zone</Button>
         </Box>
       }
       filter={
@@ -69,7 +71,7 @@ export default function HostedZonesTable() {
           counter={data?.pagination ? `(${data.pagination.total})` : ''}
           actions={
             <SpaceBetween direction="horizontal" size="xs">
-              <Button variant="primary">Create hosted zone</Button>
+              <Button variant="primary" onClick={() => router.push('/hosted-zones/create')}>Create hosted zone</Button>
             </SpaceBetween>
           }
         >
