@@ -8,9 +8,11 @@ import Header from '@cloudscape-design/components/header';
 import SpaceBetween from '@cloudscape-design/components/space-between';
 import TextFilter from '@cloudscape-design/components/text-filter';
 import Pagination from '@cloudscape-design/components/pagination';
-import { useDNSRecords } from '../hooks/useDNSRecords';
+import Modal from '@cloudscape-design/components/modal';
+import { useDNSRecords, DNSRecord } from '../hooks/useDNSRecords';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
+import api from '../../lib/api';
 
 interface DNSRecordsTableProps {
   zoneId: string;
@@ -20,16 +22,55 @@ export default function DNSRecordsTable({ zoneId }: DNSRecordsTableProps) {
   const router = useRouter();
   const [filteringText, setFilteringText] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [selectedItems, setSelectedItems] = useState<DNSRecord[]>([]);
+  const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const pageSize = 20;
 
-  const { data, isLoading } = useDNSRecords(zoneId, filteringText, '', currentPage, pageSize);
+  const { data, isLoading, mutate } = useDNSRecords(zoneId, filteringText, '', currentPage, pageSize);
 
   const records = data?.data || [];
   const totalPages = data?.pagination?.total_pages || 1;
 
+  const handleDelete = async () => {
+    if (selectedItems.length === 0) return;
+    setIsDeleting(true);
+    try {
+      await api.delete(`/hosted-zones/${zoneId}/records/${selectedItems[0].id}`);
+      setSelectedItems([]);
+      setIsDeleteModalVisible(false);
+      mutate();
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   return (
-    <Table
-      columnDefinitions={[
+    <>
+      <Modal
+        onDismiss={() => setIsDeleteModalVisible(false)}
+        visible={isDeleteModalVisible}
+        closeAriaLabel="Close modal"
+        footer={
+          <Box float="right">
+            <SpaceBetween direction="horizontal" size="xs">
+              <Button variant="link" onClick={() => setIsDeleteModalVisible(false)}>Cancel</Button>
+              <Button variant="primary" onClick={handleDelete} loading={isDeleting}>Delete</Button>
+            </SpaceBetween>
+          </Box>
+        }
+        header="Delete DNS record"
+      >
+        Are you sure you want to delete the record <b>{selectedItems[0]?.name}</b>?
+      </Modal>
+
+      <Table
+        selectionType="single"
+        selectedItems={selectedItems}
+        onSelectionChange={({ detail }) => setSelectedItems(detail.selectedItems as DNSRecord[])}
+        columnDefinitions={[
         {
           id: 'name',
           header: 'Record name',
@@ -85,6 +126,18 @@ export default function DNSRecordsTable({ zoneId }: DNSRecordsTableProps) {
           counter={data?.pagination ? `(${data.pagination.total})` : ''}
           actions={
             <SpaceBetween direction="horizontal" size="xs">
+              <Button 
+                disabled={selectedItems.length === 0} 
+                onClick={() => setIsDeleteModalVisible(true)}
+              >
+                Delete record
+              </Button>
+              <Button 
+                disabled={selectedItems.length === 0} 
+                onClick={() => router.push(`/hosted-zones/${zoneId}/edit-record/${selectedItems[0].id}`)}
+              >
+                Edit record
+              </Button>
               <Button variant="primary" onClick={() => router.push(`/hosted-zones/${zoneId}/create-record`)}>Create record</Button>
             </SpaceBetween>
           }
@@ -100,5 +153,6 @@ export default function DNSRecordsTable({ zoneId }: DNSRecordsTableProps) {
         />
       }
     />
+    </>
   );
 }
