@@ -12,7 +12,7 @@ import Modal from '@cloudscape-design/components/modal';
 import { useHostedZones, HostedZone } from '../hooks/useHostedZones';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import api from '../../lib/api';
+import api from '../lib/api';
 
 export default function HostedZonesTable() {
   const router = useRouter();

@@ -12,7 +12,7 @@ import Modal from '@cloudscape-design/components/modal';
 import { useDNSRecords, DNSRecord } from '../hooks/useDNSRecords';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import api from '../../lib/api';
+import api from '../lib/api';
 
 interface DNSRecordsTableProps {
   zoneId: string;
