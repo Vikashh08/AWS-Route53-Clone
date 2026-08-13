@@ -40,10 +40,12 @@ export default function HostedZonesTable() {
     if (selectedItems.length === 0) return;
     setIsDeleting(true);
     try {
-      await api.delete(`/hosted-zones/${selectedItems[0].id}`);
+      await Promise.all(
+        selectedItems.map(item => api.delete(`/hosted-zones/${item.id}`))
+      );
       addNotification({
         type: 'success',
-        content: `Hosted zone ${selectedItems[0].name} deleted successfully.`,
+        content: `Successfully deleted ${selectedItems.length} hosted zone(s).`,
       });
       setSelectedItems([]);
       setIsDeleteModalVisible(false);
@@ -74,14 +76,14 @@ export default function HostedZonesTable() {
               </SpaceBetween>
             </Box>
           }
-          header="Delete hosted zone"
+          header="Delete hosted zone(s)"
         >
-          Are you sure you want to delete the hosted zone <b>{selectedItems[0]?.name}</b>?
+          Are you sure you want to delete {selectedItems.length} selected hosted zone(s)? This action cannot be undone.
         </Modal>
       )}
 
       <Table
-        selectionType="single"
+        selectionType="multi"
         selectedItems={selectedItems}
         onSelectionChange={({ detail }) => setSelectedItems(detail.selectedItems as HostedZone[])}
         columnDefinitions={[
@@ -142,7 +144,7 @@ export default function HostedZonesTable() {
                 Delete zone
               </Button>
               <Button 
-                disabled={selectedItems.length === 0} 
+                disabled={selectedItems.length !== 1} 
                 onClick={() => router.push(`/hosted-zones/edit/${selectedItems[0].id}`)}
               >
                 Edit zone

@@ -27,6 +27,11 @@ class DNSRecordRepository:
             DNSRecord.hosted_zone_id == zone_id
         ).first()
 
+    def get_all(self, zone_id: str) -> list[DNSRecord]:
+        return self.db.query(DNSRecord).filter(
+            DNSRecord.hosted_zone_id == zone_id
+        ).order_by(DNSRecord.name, DNSRecord.type).all()
+
     def search(self, zone_id: str, search: str = None, record_type: str = None, skip: int = 0, limit: int = 20) -> tuple[list[DNSRecord], int]:
         query = self.db.query(DNSRecord).filter(DNSRecord.hosted_zone_id == zone_id)
         if search:

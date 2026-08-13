@@ -28,6 +28,10 @@ class DNSRecordService:
             raise AppError("DNS record not found", status_code=404, code="RECORD_NOT_FOUND")
         return record
 
+    def get_all(self, zone_id: str, user_id: str):
+        self._ensure_zone_access(zone_id, user_id)
+        return self.repo.get_all(zone_id)
+
     def search(self, zone_id: str, user_id: str, search: str = None, record_type: str = None, page: int = 1, page_size: int = 20):
         self._ensure_zone_access(zone_id, user_id)
         skip = (page - 1) * page_size

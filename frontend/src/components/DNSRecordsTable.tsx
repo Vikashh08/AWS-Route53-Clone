@@ -10,10 +10,11 @@ import TextFilter from '@cloudscape-design/components/text-filter';
 import Pagination from '@cloudscape-design/components/pagination';
 import Modal from '@cloudscape-design/components/modal';
 import { useDNSRecords, DNSRecord } from '../hooks/useDNSRecords';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '../lib/api';
 import { useNotification } from '../contexts/NotificationContext';
+import ButtonDropdown from '@cloudscape-design/components/button-dropdown';
 
 interface DNSRecordsTableProps {
   zoneId: string;
@@ -27,6 +28,8 @@ export default function DNSRecordsTable({ zoneId }: DNSRecordsTableProps) {
   const [isDeleteModalVisible, setIsDeleteModalVisible] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [isImporting, setIsImporting] = useState(false);
   
   useEffect(() => {
     setIsMounted(true);
@@ -44,10 +47,12 @@ export default function DNSRecordsTable({ zoneId }: DNSRecordsTableProps) {
     if (selectedItems.length === 0) return;
     setIsDeleting(true);
     try {
-      await api.delete(`/hosted-zones/${zoneId}/records/${selectedItems[0].id}`);
+      await Promise.all(
+        selectedItems.map(item => api.delete(`/hosted-zones/${zoneId}/records/${item.id}`))
+      );
       addNotification({
         type: 'success',
-        content: `Record ${selectedItems[0].name} deleted successfully.`,
+        content: `Successfully deleted ${selectedItems.length} record(s).`,
       });
       setSelectedItems([]);
       setIsDeleteModalVisible(false);
@@ -60,6 +65,41 @@ export default function DNSRecordsTable({ zoneId }: DNSRecordsTableProps) {
       });
     } finally {
       setIsDeleting(false);
+    }
+  };
+
+  const handleExport = (format: string) => {
+    // Assuming backend runs on 8000
+    window.open(`http://localhost:8000/api/v1/hosted-zones/${zoneId}/records/export?format=${format}`, '_blank');
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsImporting(true);
+    const formData = new FormData();
+    formData.append('file', file);
+
+    try {
+      const response = await api.post(`/hosted-zones/${zoneId}/records/import`, formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      addNotification({
+        type: 'success',
+        content: response.data.message || 'Records imported successfully.',
+      });
+      refetch();
+    } catch (err: any) {
+      addNotification({
+        type: 'error',
+        content: err.response?.data?.detail || 'Failed to import zone file.',
+      });
+    } finally {
+      setIsImporting(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     }
   };
 
@@ -78,14 +118,14 @@ export default function DNSRecordsTable({ zoneId }: DNSRecordsTableProps) {
               </SpaceBetween>
             </Box>
           }
-          header="Delete DNS record"
+          header="Delete DNS record(s)"
         >
-          Are you sure you want to delete the record <b>{selectedItems[0]?.name}</b>?
+          Are you sure you want to delete {selectedItems.length} selected record(s)? This action cannot be undone.
         </Modal>
       )}
 
       <Table
-        selectionType="single"
+        selectionType="multi"
         selectedItems={selectedItems}
         onSelectionChange={({ detail }) => setSelectedItems(detail.selectedItems as DNSRecord[])}
         columnDefinitions={[
@@ -144,6 +184,25 @@ export default function DNSRecordsTable({ zoneId }: DNSRecordsTableProps) {
           counter={data?.pagination ? `(${data.pagination.total})` : ''}
           actions={
             <SpaceBetween direction="horizontal" size="xs">
+              <input 
+                type="file" 
+                ref={fileInputRef} 
+                style={{ display: 'none' }} 
+                accept=".zone,.txt" 
+                onChange={handleFileUpload} 
+              />
+              <ButtonDropdown
+                items={[
+                  { id: 'json', text: 'Export as JSON' },
+                  { id: 'bind', text: 'Export as BIND (.zone)' }
+                ]}
+                onItemClick={({ detail }) => handleExport(detail.id)}
+              >
+                Export zone
+              </ButtonDropdown>
+              <Button onClick={() => fileInputRef.current?.click()} loading={isImporting}>
+                Import zone file
+              </Button>
               <Button 
                 disabled={selectedItems.length === 0} 
                 onClick={() => setIsDeleteModalVisible(true)}
@@ -151,7 +210,7 @@ export default function DNSRecordsTable({ zoneId }: DNSRecordsTableProps) {
                 Delete record
               </Button>
               <Button 
-                disabled={selectedItems.length === 0} 
+                disabled={selectedItems.length !== 1} 
                 onClick={() => router.push(`/hosted-zones/${zoneId}/edit-record/${selectedItems[0].id}`)}
               >
                 Edit record

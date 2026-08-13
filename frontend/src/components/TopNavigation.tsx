@@ -4,10 +4,12 @@ import * as React from 'react';
 import TopNavigation from '@cloudscape-design/components/top-navigation';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '../contexts/AuthContext';
+import { useTheme } from '../contexts/ThemeContext';
 
 export default function AppTopNavigation() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
+  const { isDarkMode, toggleTheme } = useTheme();
   
   if (pathname === '/login' || pathname === '/register') return null;
 
@@ -18,6 +20,13 @@ export default function AppTopNavigation() {
         title: 'AWS Route53 Clone',
       }}
       utilities={[
+        {
+          type: 'button',
+          iconName: isDarkMode ? 'unlocked' : 'settings',
+          title: isDarkMode ? 'Light mode' : 'Dark mode',
+          text: isDarkMode ? 'Light mode' : 'Dark mode',
+          onClick: toggleTheme
+        },
         {
           type: 'menu-dropdown',
           text: 'us-east-1',
