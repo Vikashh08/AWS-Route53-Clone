@@ -15,7 +15,8 @@ import Link from 'next/link';
 import { useAuth } from '../../contexts/AuthContext';
 import api from '../../lib/api';
 
-export default function LoginPage() {
+export default function SignupPage() {
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -28,47 +29,47 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const response = await api.post('/auth/login', { email, password });
-      login(response.data.data.access_token);
+      const response = await api.post('/auth/signup', { name, email, password });
+      // The signup endpoint sets the cookie and returns the user, just like login.
+      // We can manually trigger login flow in the context if it uses tokens,
+      // or if it relies on cookies, we can just fetch /me.
+      login('token_not_used_if_cookies');
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'An error occurred during login');
+      const detail = err.response?.data?.detail;
+      if (Array.isArray(detail)) {
+        setError(detail.map(d => d.msg).join(', '));
+      } else {
+        setError(detail || 'An error occurred during signup');
+      }
       setIsSubmitting(false);
     }
-  };
-
-  const handleDemoLogin = () => {
-    setEmail('user@example.com');
-    setPassword('password123');
-    // We defer submission slightly so state can update
-    setTimeout(() => {
-      const form = document.getElementById('login-form') as HTMLFormElement;
-      if (form) form.requestSubmit();
-    }, 50);
   };
 
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', backgroundColor: '#f2f3f3' }}>
       <div style={{ width: '400px' }}>
-        <form id="login-form" onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit}>
           <Form
             actions={
-              <SpaceBetween direction="horizontal" size="xs">
-                <Button onClick={handleDemoLogin} formAction="none">
-                  Demo login
-                </Button>
-                <Button variant="primary" formAction="submit" loading={isSubmitting}>
-                  Sign in
-                </Button>
-              </SpaceBetween>
+              <Button variant="primary" formAction="submit" loading={isSubmitting}>
+                Create account
+              </Button>
             }
           >
-            <Container header={<Header variant="h2">Sign in to AWS Route 53 Clone</Header>}>
+            <Container header={<Header variant="h2">Create a new account</Header>}>
               <SpaceBetween direction="vertical" size="l">
                 {error && (
-                  <Alert type="error" header="Sign in failed">
+                  <Alert type="error" header="Signup failed">
                     {error}
                   </Alert>
                 )}
+                <FormField label="Full Name">
+                  <Input
+                    value={name}
+                    onChange={({ detail }) => setName(detail.value)}
+                    placeholder="John Doe"
+                  />
+                </FormField>
                 <FormField label="Email address">
                   <Input
                     value={email}
@@ -90,7 +91,7 @@ export default function LoginPage() {
           </Form>
         </form>
         <Box textAlign="center" margin={{ top: 'l' }} color="text-body-secondary">
-          New to Route 53 Clone? <Link href="/signup" style={{ color: '#0972d3', textDecoration: 'none' }}>Create an account</Link>
+          Already have an account? <Link href="/login" style={{ color: '#0972d3', textDecoration: 'none' }}>Sign in</Link>
         </Box>
       </div>
     </div>

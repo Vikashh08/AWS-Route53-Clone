@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, Response, Request
 from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.schemas.auth import LoginRequest, LoginResponse, CurrentUserResponse
+from app.schemas.user import UserCreate
 from app.services.auth_service import AuthService
 from app.core.config import settings
 from app.core.exceptions import AppError
@@ -33,6 +34,22 @@ def login(login_data: LoginRequest, response: Response, db: Session = Depends(ge
     token, session_data = auth_service.login(login_data)
     
     # Set HTTP-only cookie
+    response.set_cookie(
+        key="session_token",
+        value=token,
+        httponly=True,
+        secure=settings.ENVIRONMENT == "production",
+        samesite="lax",
+        max_age=settings.SESSION_EXPIRY
+    )
+    
+    return {"data": session_data["user"]}
+
+@router.post("/signup", response_model=LoginResponse)
+def signup(user_data: UserCreate, response: Response, db: Session = Depends(get_db)):
+    auth_service = AuthService(db)
+    token, session_data = auth_service.signup(user_data)
+    
     response.set_cookie(
         key="session_token",
         value=token,

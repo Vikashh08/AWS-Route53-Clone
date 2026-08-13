@@ -9,7 +9,7 @@ export default function AppTopNavigation() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   
-  if (pathname === '/login') return null;
+  if (pathname === '/login' || pathname === '/signup') return null;
 
   return (
     <TopNavigation

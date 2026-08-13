@@ -2,6 +2,7 @@ from sqlalchemy.orm import Session
 from app.repositories.user_repository import UserRepository
 from app.repositories.session_repository import SessionRepository
 from app.schemas.auth import LoginRequest
+from app.schemas.user import UserCreate
 from app.core.security import verify_password, generate_session_token, generate_session_expires_at
 from app.core.exceptions import AppError
 import hashlib
@@ -21,6 +22,26 @@ class AuthService:
         if not user or not verify_password(login_data.password, user.password_hash):
             raise AppError("Invalid email or password", status_code=401, code="UNAUTHORIZED")
 
+        # Create session
+        token = generate_session_token()
+        token_hash = hashlib.sha256(token.encode()).hexdigest()
+        expires_at = generate_session_expires_at()
+
+        self.session_repo.create(
+            user_id=user.id,
+            token_hash=token_hash,
+            expires_at=expires_at
+        )
+
+        return token, {"user": user, "expires_at": expires_at}
+
+    def signup(self, user_in: UserCreate) -> tuple[str, dict]:
+        existing_user = self.user_repo.get_by_email(user_in.email)
+        if existing_user:
+            raise AppError("Email already registered", status_code=400, code="BAD_REQUEST")
+        
+        user = self.user_repo.create(user_in)
+        
         # Create session
         token = generate_session_token()
         token_hash = hashlib.sha256(token.encode()).hexdigest()
