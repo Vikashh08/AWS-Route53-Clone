@@ -129,26 +129,21 @@ Templates are provided in `.env.example`.
 - The backend runs on `http://localhost:8000`
 - API calls from the frontend use the pre-configured Axios client in `frontend/src/lib/api.ts` which automatically attaches credentials.
 
-## 13. Testing
-- The backend architecture (Router -> Service -> Repository) makes it trivial to unit test business logic by mocking repositories.
-- *(Test suites can be added using `pytest` for backend and `jest` for frontend).*
-
-## 14. Deployment
+## 13. Deployment
 - **Frontend**: Can be deployed seamlessly to Vercel or AWS Amplify.
 - **Backend**: Can be containerized via Docker and deployed to AWS App Runner, ECS, or Render.
 - *Note:* Since this uses SQLite, the backend environment must support persistent disk storage (e.g., an attached EBS volume or Render Disk) to avoid losing data between deployments.
 
-## 15. Bonus Features
+## 14. Bonus Features
 - **Auto-provisioned Records**: Creates realistic `NS` and `SOA` records automatically when a Hosted Zone is created.
 - **Dynamic Dashboard**: Fetches and aggregates real-time metrics across all hosted zones and records.
 - **Strict Validation**: Validates IPv4/IPv6 addresses, CNAME formats, and TXT structures at the API boundary.
 
-## 16. Limitations
+## 15. Limitations
 - Does not modify actual DNS records.
 - Mocked AWS services (Traffic Policies, Health Checks) are stubbed with "Coming Soon" pages.
 - Advanced routing policies (Latency, Weighted) exist in the DB but lack complex UI workflows in this clone.
 
-## 17. Future Improvements
-- Add `pytest` test coverage for the Service layer.
+## 16. Future Improvements
 - Add multi-user tenancy (currently scopes data strictly to the logged-in user, but lacks an admin view).
 - Migrate to PostgreSQL for scalable production deployments.
