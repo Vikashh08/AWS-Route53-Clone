@@ -90,7 +90,7 @@ export default function LoginPage() {
           </Form>
         </form>
         <Box textAlign="center" margin={{ top: 'l' }} color="text-body-secondary">
-          New to Route 53 Clone? <Link href="/signup" style={{ color: '#0972d3', textDecoration: 'none' }}>Create an account</Link>
+          New to Route 53 Clone? <Link href="/register" style={{ color: '#0972d3', textDecoration: 'none' }}>Create an account</Link>
         </Box>
       </div>
     </div>
