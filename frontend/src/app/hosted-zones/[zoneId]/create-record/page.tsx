@@ -15,16 +15,17 @@ import Alert from '@cloudscape-design/components/alert';
 import { useRouter } from 'next/navigation';
 import api from '../../../../lib/api';
 import { useNotification } from '../../../../contexts/NotificationContext';
+import { SelectProps } from '@cloudscape-design/components/select';
 
-export default function CreateRecordPage({ params }: { params: { zoneId: string } }) {
+export default function CreateRecordPage({ params }: { params: Promise<{ zoneId: string }> }) {
   const router = useRouter();
   const { addNotification } = useNotification();
-  const { zoneId } = use(params) as any;
+  const { zoneId } = React.use(params);
   const [recordName, setRecordName] = useState('');
-  const [recordType, setRecordType] = useState({ label: 'A - Routes traffic to an IPv4 address', value: 'A' });
+  const [recordType, setRecordType] = useState<SelectProps.Option>({ label: 'A - Routes traffic to an IPv4 address', value: 'A' });
   const [value, setValue] = useState('');
   const [ttl, setTtl] = useState('300');
-  const [routingPolicy, setRoutingPolicy] = useState({ label: 'Simple routing', value: 'Simple' });
+  const [routingPolicy, setRoutingPolicy] = useState<SelectProps.Option>({ label: 'Simple routing', value: 'Simple' });
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
@@ -96,7 +97,14 @@ export default function CreateRecordPage({ params }: { params: { zoneId: string 
               <FormField label="Record type">
                 <Select
                   selectedOption={recordType}
-                  onChange={({ detail }) => setRecordType(detail.selectedOption)}
+                  onChange={({ detail }) => {
+                    if (detail.selectedOption) {
+                      setRecordType({
+                        label: detail.selectedOption.label || '',
+                        value: detail.selectedOption.value || ''
+                      });
+                    }
+                  }}
                   options={[
                     { label: 'A - Routes traffic to an IPv4 address', value: 'A' },
                     { label: 'AAAA - Routes traffic to an IPv6 address', value: 'AAAA' },
@@ -133,7 +141,14 @@ export default function CreateRecordPage({ params }: { params: { zoneId: string 
               <FormField label="Routing policy">
                 <Select
                   selectedOption={routingPolicy}
-                  onChange={({ detail }) => setRoutingPolicy(detail.selectedOption)}
+                  onChange={({ detail }) => {
+                    if (detail.selectedOption) {
+                      setRoutingPolicy({
+                        label: detail.selectedOption.label || '',
+                        value: detail.selectedOption.value || ''
+                      });
+                    }
+                  }}
                   options={[
                     { label: 'Simple routing', value: 'Simple' },
                     { label: 'Weighted', value: 'Weighted' },

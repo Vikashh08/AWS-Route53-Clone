@@ -22,7 +22,6 @@ export default function AppTopNavigation() {
           type: 'menu-dropdown',
           text: 'us-east-1',
           description: 'US East (N. Virginia)',
-          iconName: 'location',
           items: [{ id: 'us-east-1', text: 'US East (N. Virginia)' }]
         },
         {

@@ -34,7 +34,7 @@ export default function DNSRecordsTable({ zoneId }: DNSRecordsTableProps) {
   
   const pageSize = 20;
 
-  const { data, isLoading, mutate } = useDNSRecords(zoneId, filteringText, '', currentPage, pageSize);
+  const { data, isLoading, refetch } = useDNSRecords(zoneId, filteringText, '', currentPage, pageSize);
   const { addNotification } = useNotification();
 
   const records = data?.data || [];
@@ -51,7 +51,7 @@ export default function DNSRecordsTable({ zoneId }: DNSRecordsTableProps) {
       });
       setSelectedItems([]);
       setIsDeleteModalVisible(false);
-      mutate();
+      refetch();
     } catch (err) {
       console.error(err);
       addNotification({

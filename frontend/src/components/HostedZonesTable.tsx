@@ -30,7 +30,7 @@ export default function HostedZonesTable() {
 
   const pageSize = 20;
 
-  const { data, isLoading, isError, mutate } = useHostedZones(filteringText, currentPage, pageSize);
+  const { data, isLoading, isError, refetch } = useHostedZones(filteringText, currentPage, pageSize);
   const { addNotification } = useNotification();
 
   const zones = data?.data || [];
@@ -47,7 +47,7 @@ export default function HostedZonesTable() {
       });
       setSelectedItems([]);
       setIsDeleteModalVisible(false);
-      mutate(); // refresh data
+      refetch(); // refresh data
     } catch (err) {
       console.error(err);
       addNotification({

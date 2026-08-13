@@ -15,6 +15,8 @@ import Alert from '@cloudscape-design/components/alert';
 import Spinner from '@cloudscape-design/components/spinner';
 import { useRouter } from 'next/navigation';
 import api from '../../../../../lib/api';
+import { useNotification } from '../../../../../contexts/NotificationContext';
+import { SelectProps } from '@cloudscape-design/components/select';
 
 const RECORD_TYPES = [
   { label: 'A - Routes traffic to an IPv4 address', value: 'A' },
@@ -35,15 +37,16 @@ const ROUTING_POLICIES = [
   { label: 'Failover', value: 'Failover' }
 ];
 
-export default function EditRecordPage({ params }: { params: { zoneId: string, recordId: string } }) {
+export default function EditRecordPage({ params }: { params: Promise<{ zoneId: string; recordId: string }> }) {
   const router = useRouter();
-  const { zoneId, recordId } = use(params) as any;
+  const { addNotification } = useNotification();
+  const { zoneId, recordId } = React.use(params);
   
   const [recordName, setRecordName] = useState('');
-  const [recordType, setRecordType] = useState(RECORD_TYPES[0]);
+  const [recordType, setRecordType] = useState<SelectProps.Option>(RECORD_TYPES[0]);
   const [value, setValue] = useState('');
   const [ttl, setTtl] = useState('300');
-  const [routingPolicy, setRoutingPolicy] = useState(ROUTING_POLICIES[0]);
+  const [routingPolicy, setRoutingPolicy] = useState<SelectProps.Option>(ROUTING_POLICIES[0]);
   
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -135,7 +138,14 @@ export default function EditRecordPage({ params }: { params: { zoneId: string, r
               <FormField label="Record type">
                 <Select
                   selectedOption={recordType}
-                  onChange={({ detail }) => setRecordType(detail.selectedOption)}
+                  onChange={({ detail }) => {
+                    if (detail.selectedOption) {
+                      setRecordType({
+                        label: detail.selectedOption.label || '',
+                        value: detail.selectedOption.value || ''
+                      });
+                    }
+                  }}
                   options={RECORD_TYPES}
                 />
               </FormField>
@@ -162,7 +172,14 @@ export default function EditRecordPage({ params }: { params: { zoneId: string, r
               <FormField label="Routing policy">
                 <Select
                   selectedOption={routingPolicy}
-                  onChange={({ detail }) => setRoutingPolicy(detail.selectedOption)}
+                  onChange={({ detail }) => {
+                    if (detail.selectedOption) {
+                      setRoutingPolicy({
+                        label: detail.selectedOption.label || '',
+                        value: detail.selectedOption.value || ''
+                      });
+                    }
+                  }}
                   options={ROUTING_POLICIES}
                 />
               </FormField>

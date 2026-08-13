@@ -13,10 +13,10 @@ export interface HostedZone {
 }
 
 export interface Pagination {
-  page: int;
-  page_size: int;
-  total: int;
-  total_pages: int;
+  page: number;
+  page_size: number;
+  total: number;
+  total_pages: number;
 }
 
 export interface HostedZonesResponse {

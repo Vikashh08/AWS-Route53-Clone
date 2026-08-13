@@ -4,8 +4,8 @@ import Button from '@cloudscape-design/components/button';
 import SpaceBetween from '@cloudscape-design/components/space-between';
 import DNSRecordsTable from '../../../components/DNSRecordsTable';
 
-export default function HostedZoneDetailsPage({ params }: { params: { zoneId: string } }) {
-  const { zoneId } = React.use(params) as any;
+export default function HostedZoneDetailsPage({ params }: { params: Promise<{ zoneId: string }> }) {
+  const { zoneId } = React.use(params);
   
   return (
     <div style={{ padding: '24px' }}>
