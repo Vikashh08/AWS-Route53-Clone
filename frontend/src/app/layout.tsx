@@ -4,6 +4,7 @@ import "./globals.css";
 import "@cloudscape-design/global-styles/index.css";
 import Providers from "./providers";
 import AppTopNavigation from "../components/TopNavigation";
+import AppLayoutClient from "../components/AppLayoutClient";
 import { AuthProvider } from "../contexts/AuthContext";
 import { NotificationProvider } from "../contexts/NotificationContext";
 
