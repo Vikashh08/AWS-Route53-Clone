@@ -30,6 +30,21 @@ class DNSRecordBase(BaseModel):
             # Simple hostname validation
             if not re.match(r'^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$', value) and not value.endswith('.'):
                 raise ValueError(f"Invalid hostname for {record_type} record")
+        elif record_type == "MX":
+            # Very basic check: 10 mail.example.com
+            if not re.match(r'^\d+\s+\S+$', value):
+                raise ValueError("Invalid MX record format. Expected: <priority> <mail-server>")
+        elif record_type == "TXT":
+            if not value:
+                raise ValueError("TXT record cannot be empty")
+        elif record_type == "SRV":
+            # Priority Weight Port Target
+            if not re.match(r'^\d+\s+\d+\s+\d+\s+\S+$', value):
+                raise ValueError("Invalid SRV format. Expected: <priority> <weight> <port> <target>")
+        elif record_type == "CAA":
+            # Flag Tag Value
+            if not re.match(r'^\d+\s+\S+\s+".*"$', value):
+                raise ValueError("Invalid CAA format. Expected: <flag> <tag> \"<value>\"")
         
         return self
 

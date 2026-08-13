@@ -21,7 +21,11 @@ const RECORD_TYPES = [
   { label: 'AAAA - Routes traffic to an IPv6 address', value: 'AAAA' },
   { label: 'CNAME - Routes traffic to another domain name', value: 'CNAME' },
   { label: 'MX - Specifies mail servers', value: 'MX' },
-  { label: 'TXT - Text records', value: 'TXT' }
+  { label: 'TXT - Text records', value: 'TXT' },
+  { label: 'NS - Name servers', value: 'NS' },
+  { label: 'PTR - Pointer to a canonical name', value: 'PTR' },
+  { label: 'SRV - Service locator', value: 'SRV' },
+  { label: 'CAA - Certificate Authority Authorization', value: 'CAA' }
 ];
 
 const ROUTING_POLICIES = [

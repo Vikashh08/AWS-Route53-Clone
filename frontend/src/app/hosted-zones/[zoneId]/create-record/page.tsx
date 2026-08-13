@@ -14,9 +14,11 @@ import Select from '@cloudscape-design/components/select';
 import Alert from '@cloudscape-design/components/alert';
 import { useRouter } from 'next/navigation';
 import api from '../../../../lib/api';
+import { useNotification } from '../../../../contexts/NotificationContext';
 
 export default function CreateRecordPage({ params }: { params: { zoneId: string } }) {
   const router = useRouter();
+  const { addNotification } = useNotification();
   const { zoneId } = use(params) as any;
   const [recordName, setRecordName] = useState('');
   const [recordType, setRecordType] = useState({ label: 'A - Routes traffic to an IPv4 address', value: 'A' });
@@ -39,6 +41,10 @@ export default function CreateRecordPage({ params }: { params: { zoneId: string 
         value: value,
         ttl: parseInt(ttl, 10),
         routing_policy: routingPolicy.value
+      });
+      addNotification({
+        type: 'success',
+        content: `Record ${recordName || '@'} created successfully.`,
       });
       router.push(`/hosted-zones/${zoneId}`);
     } catch (err: any) {
@@ -96,7 +102,11 @@ export default function CreateRecordPage({ params }: { params: { zoneId: string 
                     { label: 'AAAA - Routes traffic to an IPv6 address', value: 'AAAA' },
                     { label: 'CNAME - Routes traffic to another domain name', value: 'CNAME' },
                     { label: 'MX - Specifies mail servers', value: 'MX' },
-                    { label: 'TXT - Text records', value: 'TXT' }
+                    { label: 'TXT - Text records', value: 'TXT' },
+                    { label: 'NS - Name servers', value: 'NS' },
+                    { label: 'PTR - Pointer to a canonical name', value: 'PTR' },
+                    { label: 'SRV - Service locator', value: 'SRV' },
+                    { label: 'CAA - Certificate Authority Authorization', value: 'CAA' }
                   ]}
                 />
               </FormField>

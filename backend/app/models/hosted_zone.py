@@ -24,3 +24,7 @@ class HostedZone(Base):
     
     user = relationship("User")
     records = relationship("DNSRecord", back_populates="hosted_zone", cascade="all, delete-orphan")
+
+    @property
+    def record_count(self) -> int:
+        return len(self.records)

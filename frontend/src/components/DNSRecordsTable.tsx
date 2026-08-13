@@ -13,6 +13,7 @@ import { useDNSRecords, DNSRecord } from '../hooks/useDNSRecords';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '../lib/api';
+import { useNotification } from '../contexts/NotificationContext';
 
 interface DNSRecordsTableProps {
   zoneId: string;
@@ -28,6 +29,7 @@ export default function DNSRecordsTable({ zoneId }: DNSRecordsTableProps) {
   const pageSize = 20;
 
   const { data, isLoading, mutate } = useDNSRecords(zoneId, filteringText, '', currentPage, pageSize);
+  const { addNotification } = useNotification();
 
   const records = data?.data || [];
   const totalPages = data?.pagination?.total_pages || 1;
@@ -37,11 +39,19 @@ export default function DNSRecordsTable({ zoneId }: DNSRecordsTableProps) {
     setIsDeleting(true);
     try {
       await api.delete(`/hosted-zones/${zoneId}/records/${selectedItems[0].id}`);
+      addNotification({
+        type: 'success',
+        content: `Record ${selectedItems[0].name} deleted successfully.`,
+      });
       setSelectedItems([]);
       setIsDeleteModalVisible(false);
       mutate();
     } catch (err) {
       console.error(err);
+      addNotification({
+        type: 'error',
+        content: 'Failed to delete record. Please try again.',
+      });
     } finally {
       setIsDeleting(false);
     }

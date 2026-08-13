@@ -7,6 +7,7 @@ export interface HostedZone {
   zone_type: string;
   comment?: string;
   is_private: boolean;
+  record_count: number;
   created_at: string;
   updated_at: string;
 }

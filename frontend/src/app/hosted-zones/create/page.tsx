@@ -14,9 +14,11 @@ import RadioGroup from '@cloudscape-design/components/radio-group';
 import Alert from '@cloudscape-design/components/alert';
 import { useRouter } from 'next/navigation';
 import api from '../../../lib/api';
+import { useNotification } from '../../../contexts/NotificationContext';
 
 export default function CreateHostedZonePage() {
   const router = useRouter();
+  const { addNotification } = useNotification();
   const [domainName, setDomainName] = useState('');
   const [description, setDescription] = useState('');
   const [type, setType] = useState('Public');
@@ -33,6 +35,10 @@ export default function CreateHostedZonePage() {
         name: domainName,
         description: description || undefined,
         is_private: type === 'Private'
+      });
+      addNotification({
+        type: 'success',
+        content: `Hosted zone ${domainName} created successfully.`,
       });
       router.push('/hosted-zones');
     } catch (err: any) {

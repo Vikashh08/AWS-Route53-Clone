@@ -9,13 +9,26 @@ import ColumnLayout from '@cloudscape-design/components/column-layout';
 import Link from '@cloudscape-design/components/link';
 import Button from '@cloudscape-design/components/button';
 import { useRouter } from 'next/navigation';
-import { useHostedZones } from '../../hooks/useHostedZones';
 import { useAuth } from '../../contexts/AuthContext';
+import { useEffect, useState } from 'react';
+import api from '../../lib/api';
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { data } = useHostedZones(1, 1);
   const { user } = useAuth();
+  const [stats, setStats] = useState({ hosted_zones: 0, dns_records: 0 });
+
+  useEffect(() => {
+    const fetchStats = async () => {
+      try {
+        const res = await api.get('/hosted-zones/stats');
+        setStats(res.data);
+      } catch (err) {
+        console.error("Failed to fetch stats", err);
+      }
+    };
+    fetchStats();
+  }, []);
   
   return (
     <div style={{ padding: '24px' }}>
@@ -33,7 +46,11 @@ export default function DashboardPage() {
               
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid #eaeded' }}>
                 <Link fontSize="heading-m" onFollow={() => router.push('/hosted-zones')}>Hosted zones</Link>
-                <Box fontSize="heading-l" fontWeight="bold">{data?.pagination?.total || 0}</Box>
+                <Box fontSize="heading-l" fontWeight="bold">{stats.hosted_zones}</Box>
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '12px 0', borderBottom: '1px solid #eaeded' }}>
+                <Box fontSize="heading-m" color="text-body-secondary">DNS records</Box>
+                <Box fontSize="heading-l" fontWeight="bold">{stats.dns_records}</Box>
               </div>
               
               <Button onClick={() => router.push('/hosted-zones/create')}>Create hosted zone</Button>

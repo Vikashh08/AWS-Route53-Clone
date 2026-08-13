@@ -43,6 +43,15 @@ class HostedZoneRepository:
         items = query.order_by(HostedZone.name).offset(skip).limit(limit).all()
         return items, total
 
+    def get_stats(self, user_id: str) -> dict:
+        from app.models.dns_record import DNSRecord
+        zones_count = self.db.query(HostedZone).filter(HostedZone.user_id == user_id).count()
+        records_count = self.db.query(DNSRecord).join(HostedZone).filter(HostedZone.user_id == user_id).count()
+        return {
+            "hosted_zones": zones_count,
+            "dns_records": records_count
+        }
+
     def update(self, db_zone: HostedZone, zone_in: HostedZoneUpdate) -> HostedZone:
         if zone_in.description != None:
             db_zone.comment = zone_in.description

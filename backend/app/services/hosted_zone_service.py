@@ -1,6 +1,8 @@
 from sqlalchemy.orm import Session
 from app.repositories.hosted_zone_repository import HostedZoneRepository
+from app.services.dns_record_service import DNSRecordService
 from app.schemas.hosted_zone import HostedZoneCreate, HostedZoneUpdate, HostedZoneResponse
+from app.schemas.dns_record import DNSRecordCreate
 from app.core.exceptions import AppError
 import math
 
@@ -14,7 +16,28 @@ class HostedZoneService:
         if existing:
             raise AppError(f"Hosted zone '{zone_in.name}' already exists.", status_code=409, code="HOSTED_ZONE_EXISTS")
         
-        return self.repo.create(zone_in, user_id)
+        zone = self.repo.create(zone_in, user_id)
+        
+        # Auto-create default NS and SOA records
+        record_service = DNSRecordService(self.db)
+        
+        ns_record = DNSRecordCreate(
+            name=zone.name,
+            type="NS",
+            ttl=172800,
+            value="ns-1.route53clone.local\nns-2.route53clone.local\nns-3.route53clone.local\nns-4.route53clone.local"
+        )
+        record_service.create(zone.id, ns_record, user_id)
+        
+        soa_record = DNSRecordCreate(
+            name=zone.name,
+            type="SOA",
+            ttl=900,
+            value="ns-1.route53clone.local. awsdns-hostmaster.amazon.com. 1 7200 900 1209600 86400"
+        )
+        record_service.create(zone.id, soa_record, user_id)
+        
+        return zone
 
     def get_by_id(self, zone_id: str, user_id: str):
         zone = self.repo.get_by_id(zone_id, user_id)
@@ -32,6 +55,9 @@ class HostedZoneService:
             "total": total,
             "total_pages": total_pages
         }
+
+    def get_stats(self, user_id: str):
+        return self.repo.get_stats(user_id)
 
     def update(self, zone_id: str, zone_in: HostedZoneUpdate, user_id: str):
         zone = self.get_by_id(zone_id, user_id)

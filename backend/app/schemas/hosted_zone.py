@@ -19,6 +19,7 @@ class HostedZoneResponse(BaseModel):
     zone_type: str
     comment: Optional[str] = None
     is_private: bool
+    record_count: int = 0
     created_at: datetime
     updated_at: datetime
 

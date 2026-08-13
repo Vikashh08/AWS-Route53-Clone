@@ -13,6 +13,7 @@ import { useHostedZones, HostedZone } from '../hooks/useHostedZones';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import api from '../lib/api';
+import { useNotification } from '../contexts/NotificationContext';
 
 export default function HostedZonesTable() {
   const router = useRouter();
@@ -24,6 +25,7 @@ export default function HostedZonesTable() {
   const pageSize = 20;
 
   const { data, isLoading, isError, mutate } = useHostedZones(filteringText, currentPage, pageSize);
+  const { addNotification } = useNotification();
 
   const zones = data?.data || [];
   const totalPages = data?.pagination?.total_pages || 1;
@@ -33,11 +35,19 @@ export default function HostedZonesTable() {
     setIsDeleting(true);
     try {
       await api.delete(`/hosted-zones/${selectedItems[0].id}`);
+      addNotification({
+        type: 'success',
+        content: `Hosted zone ${selectedItems[0].name} deleted successfully.`,
+      });
       setSelectedItems([]);
       setIsDeleteModalVisible(false);
       mutate(); // refresh data
     } catch (err) {
       console.error(err);
+      addNotification({
+        type: 'error',
+        content: 'Failed to delete hosted zone. Please try again.',
+      });
     } finally {
       setIsDeleting(false);
     }
@@ -78,6 +88,11 @@ export default function HostedZonesTable() {
           id: 'type',
           header: 'Type',
           cell: item => item.zone_type,
+        },
+        {
+          id: 'records',
+          header: 'Records',
+          cell: item => item.record_count,
         },
         {
           id: 'comment',

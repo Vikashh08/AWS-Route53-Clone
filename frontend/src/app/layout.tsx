@@ -4,9 +4,8 @@ import "./globals.css";
 import "@cloudscape-design/global-styles/index.css";
 import Providers from "./providers";
 import AppTopNavigation from "../components/TopNavigation";
-import Navigation from "../components/Navigation";
-import AppLayoutClient from "../components/AppLayoutClient";
 import { AuthProvider } from "../contexts/AuthContext";
+import { NotificationProvider } from "../contexts/NotificationContext";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,12 +23,14 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Providers>
-          <AuthProvider>
-            <AppTopNavigation />
-            <AppLayoutClient>
-              {children}
-            </AppLayoutClient>
-          </AuthProvider>
+          <NotificationProvider>
+            <AuthProvider>
+              <AppTopNavigation />
+              <AppLayoutClient>
+                {children}
+              </AppLayoutClient>
+            </AuthProvider>
+          </NotificationProvider>
         </Providers>
       </body>
     </html>

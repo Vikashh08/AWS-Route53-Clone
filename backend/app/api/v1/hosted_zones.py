@@ -19,6 +19,14 @@ def create_hosted_zone(
     zone = service.create(zone_in, current_user.id)
     return {"data": zone}
 
+@router.get("/stats")
+def get_stats(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db)
+):
+    service = HostedZoneService(db)
+    return service.get_stats(current_user.id)
+
 @router.get("", response_model=PaginatedResponse[HostedZoneResponse])
 def get_hosted_zones(
     search: str = Query(None, description="Search by name or comment"),
