@@ -13,7 +13,7 @@ import Textarea from '@cloudscape-design/components/textarea';
 import Select from '@cloudscape-design/components/select';
 import Alert from '@cloudscape-design/components/alert';
 import Spinner from '@cloudscape-design/components/spinner';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import api from '../../../../../lib/api';
 import { useNotification } from '../../../../../contexts/NotificationContext';
 import { SelectProps } from '@cloudscape-design/components/select';
@@ -37,10 +37,12 @@ const ROUTING_POLICIES = [
   { label: 'Failover', value: 'Failover' }
 ];
 
-export default function EditRecordPage({ params }: { params: Promise<{ zoneId: string; recordId: string }> }) {
+export default function EditRecordPage() {
   const router = useRouter();
+  const params = useParams();
+  const zoneId = params.zoneId as string;
+  const recordId = params.recordId as string;
   const { addNotification } = useNotification();
-  const { zoneId, recordId } = React.use(params);
   
   const [recordName, setRecordName] = useState('');
   const [recordType, setRecordType] = useState<SelectProps.Option>(RECORD_TYPES[0]);

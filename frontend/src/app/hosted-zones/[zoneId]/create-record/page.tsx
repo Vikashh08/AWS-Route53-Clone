@@ -12,15 +12,16 @@ import Input from '@cloudscape-design/components/input';
 import Textarea from '@cloudscape-design/components/textarea';
 import Select from '@cloudscape-design/components/select';
 import Alert from '@cloudscape-design/components/alert';
-import { useRouter } from 'next/navigation';
+import { useRouter, useParams } from 'next/navigation';
 import api from '../../../../lib/api';
 import { useNotification } from '../../../../contexts/NotificationContext';
 import { SelectProps } from '@cloudscape-design/components/select';
 
-export default function CreateRecordPage({ params }: { params: Promise<{ zoneId: string }> }) {
+export default function CreateRecordPage() {
   const router = useRouter();
+  const params = useParams();
+  const zoneId = params.zoneId as string;
   const { addNotification } = useNotification();
-  const { zoneId } = React.use(params);
   const [recordName, setRecordName] = useState('');
   const [recordType, setRecordType] = useState<SelectProps.Option>({ label: 'A - Routes traffic to an IPv4 address', value: 'A' });
   const [value, setValue] = useState('');
