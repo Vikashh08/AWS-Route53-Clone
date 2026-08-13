@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     SESSION_EXPIRY: int = 86400
     
     # CORS Origins
-    CORS_ORIGINS: List[str] = ["http://localhost:3000"]
+    CORS_ORIGINS: List[str] = ["*"]
     
     class Config:
         env_file = ".env"
