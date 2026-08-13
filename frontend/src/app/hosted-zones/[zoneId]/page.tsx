@@ -1,16 +1,19 @@
-import DNSRecordsTable from "../../../components/DNSRecordsTable";
+import * as React from 'react';
 import Header from '@cloudscape-design/components/header';
+import Button from '@cloudscape-design/components/button';
+import SpaceBetween from '@cloudscape-design/components/space-between';
+import DNSRecordsTable from '../../../components/DNSRecordsTable';
 
 export default function HostedZoneDetailsPage({ params }: { params: { zoneId: string } }) {
-  // In a full implementation we would also fetch the Zone details here
+  const { zoneId } = React.use(params) as any;
   
   return (
     <div style={{ padding: '24px' }}>
-      <Header variant="h1" description="Hosted zone details and records">
-        Hosted Zone
+      <Header variant="h1">
+        Hosted zone details
       </Header>
       <div style={{ marginTop: '24px' }}>
-        <DNSRecordsTable zoneId={params.zoneId} />
+        <DNSRecordsTable zoneId={zoneId} />
       </div>
     </div>
   );
