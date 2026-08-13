@@ -38,8 +38,8 @@ def login(login_data: LoginRequest, response: Response, db: Session = Depends(ge
         key="session_token",
         value=token,
         httponly=True,
-        secure=settings.ENVIRONMENT == "production",
-        samesite="lax",
+        secure=True,
+        samesite="none",
         max_age=settings.SESSION_EXPIRY
     )
     
@@ -54,8 +54,8 @@ def signup(user_data: UserCreate, response: Response, db: Session = Depends(get_
         key="session_token",
         value=token,
         httponly=True,
-        secure=settings.ENVIRONMENT == "production",
-        samesite="lax",
+        secure=True,
+        samesite="none",
         max_age=settings.SESSION_EXPIRY
     )
     
@@ -68,7 +68,7 @@ def logout(request: Request, response: Response, db: Session = Depends(get_db)):
         auth_service = AuthService(db)
         auth_service.logout(token)
     
-    response.delete_cookie("session_token")
+    response.delete_cookie("session_token", secure=True, samesite="none")
     return {"data": {"message": "Logged out successfully"}}
 
 @router.get("/me", response_model=CurrentUserResponse)
