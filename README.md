@@ -20,7 +20,15 @@ This application is a faithful recreation of the AWS Route 53 management console
 > *(Screenshots can be added here)*
 
 ## 4. Architecture
-The application strictly enforces separation of concerns, ensuring the frontend never directly accesses the database, and the backend routes delegate logic to dedicated Services and Repositories.
+The application follows a tiered clean architecture, strictly separating the frontend presentation layer from the backend API, allowing each to be scaled and maintained independently.
+
+### Frontend
+The frontend is built using Next.js 14 utilizing the App Router. It leverages React Server Components for improved initial load times, while falling back to Client Components where interactivity is required.
+For styling, the application strictly adheres to the Cloudscape Design System (the official open-source design language used internally by AWS). State management is handled by TanStack React Query, providing aggressive caching and immediate cache invalidation upon data mutations (such as creating a DNS record), resulting in a zero-refresh user experience.
+
+### Backend
+The backend is a high-performance RESTful API constructed with FastAPI and Python. The codebase strictly isolates routing logic (`api/`), business services (`services/`), database repositories (`repositories/`), and data schemas (`schemas/`).
+Data validation is handled by Pydantic V2, ensuring all payloads are rigorously validated via regular expressions before reaching the database layer.
 
 ```text
                     ┌──────────────┐
@@ -81,19 +89,57 @@ route53-clone/
 ```
 
 ## 7. Database Schema
-The database uses SQLAlchemy with Alembic for migrations.
-- `users`: id, email, password_hash, created_at, updated_at
-- `sessions`: id, user_id, token, expires_at
-- `hosted_zones`: id, name, zone_type, comment, is_private, user_id, created_at, updated_at
-- `dns_records`: id, hosted_zone_id, name, type, ttl, routing_policy, value, created_at, updated_at
+The application relies on a relational database model managed by SQLAlchemy 2.0. By default, it operates on a lightweight SQLite database, tracked and executed via Alembic.
+
+The schema is composed of three primary tables:
+
+1.  **Users Table** (`users`)
+    *   `id`: Primary key (UUID string)
+    *   `email`: Unique string used for login
+    *   `hashed_password`: Securely hashed password string using bcrypt
+    *   `name`: Display name for the user profile
+
+2.  **Hosted Zones Table** (`hosted_zones`)
+    *   `id`: Primary key (UUID string)
+    *   `name`: The domain name of the hosted zone (e.g., example.com)
+    *   `caller_reference`: A unique string used to prevent duplicate creation requests
+    *   `config_comment`: An optional string describing the purpose of the zone
+    *   `resource_record_set_count`: An integer tracking the total number of records inside this zone
+    *   `user_id`: Foreign key linking the zone to the user who created it
+
+3.  **DNS Records Table** (`dns_records`)
+    *   `id`: Primary key (UUID string)
+    *   `hosted_zone_id`: Foreign key linking the record to its parent zone
+    *   `name`: The subdomain or root domain (e.g., api.example.com)
+    *   `type`: The standard DNS record type (A, AAAA, CNAME, TXT, MX, NS, PTR, SRV, CAA)
+    *   `value`: The destination value or IP address. Multiline values are stored as a newline-separated string
+    *   `ttl`: Time To Live (integer in seconds) indicating how long resolvers should cache the record
+    *   `routing_policy`: The traffic routing configuration (defaults to Simple)
 
 ## 8. API Documentation
-FastAPI automatically generates interactive Swagger documentation.
-When the backend is running, visit: `http://localhost:8000/docs` to test:
-- `POST /api/v1/auth/login`
-- `GET /api/v1/hosted-zones`
-- `POST /api/v1/hosted-zones/{zone_id}/records`
-- *(and all other endpoints)*
+The FastAPI backend exposes a comprehensive set of RESTful endpoints. All interactive Swagger documentation is automatically generated at `http://localhost:8000/docs`.
+
+### Authentication Endpoints
+*   `POST /api/v1/auth/register`: Provisions a new account.
+*   `POST /api/v1/auth/login`: Authenticates user and returns JWT token.
+*   `GET /api/v1/auth/me`: Retrieves current authenticated user profile.
+*   `POST /api/v1/auth/logout`: Invalidates session.
+
+### Hosted Zone Endpoints
+*   `GET /api/v1/hosted-zones`: Retrieves paginated list of all hosted zones owned by the user.
+*   `POST /api/v1/hosted-zones`: Creates a new hosted zone and initializes it with default SOA/NS records.
+*   `GET /api/v1/hosted-zones/{zone_id}`: Retrieves detailed configuration of a specific hosted zone.
+*   `PATCH /api/v1/hosted-zones/{zone_id}`: Updates metadata (comment) for a hosted zone.
+*   `DELETE /api/v1/hosted-zones/{zone_id}`: Permanently removes a hosted zone and cascades deletion to records.
+
+### DNS Record Endpoints
+*   `GET /api/v1/hosted-zones/{zone_id}/records`: Retrieves paginated list of DNS records for a specific zone.
+*   `POST /api/v1/hosted-zones/{zone_id}/records`: Creates a new DNS record.
+*   `GET /api/v1/hosted-zones/{zone_id}/records/{record_id}`: Retrieves details of a single DNS record.
+*   `PATCH /api/v1/hosted-zones/{zone_id}/records/{record_id}`: Updates values or TTL of an existing DNS record.
+*   `DELETE /api/v1/hosted-zones/{zone_id}/records/{record_id}`: Removes a DNS record from the zone.
+*   `GET /api/v1/hosted-zones/{zone_id}/records/export`: Streams all records in the zone back to the client as JSON or standard BIND `.zone` text file.
+*   `POST /api/v1/hosted-zones/{zone_id}/records/import`: Accepts multipart form upload of a standard BIND `.zone` file and populates the database.
 
 ## 9. Authentication
 The application uses cookie-based session authentication.
