@@ -88,7 +88,7 @@ The FastAPI backend exposes a comprehensive set of RESTful endpoints. All endpoi
 
 ## Setup Instructions
 
-Follow these instructions to run the application locally for development and testing.
+Follow these instructions to run the application locally for development.
 
 ### Prerequisites
 *   Python 3.10 or higher
