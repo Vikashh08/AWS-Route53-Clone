@@ -3,6 +3,9 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import "@cloudscape-design/global-styles/index.css";
 import Providers from "./providers";
+import AppTopNavigation from "../components/TopNavigation";
+import Navigation from "../components/Navigation";
+import AppLayoutClient from "../components/AppLayoutClient";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -20,7 +23,10 @@ export default function RootLayout({
     <html lang="en">
       <body className={inter.className}>
         <Providers>
-          {children}
+          <AppTopNavigation />
+          <AppLayoutClient>
+            {children}
+          </AppLayoutClient>
         </Providers>
       </body>
     </html>
