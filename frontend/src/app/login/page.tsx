@@ -65,11 +65,11 @@ export default function LoginPage() {
             <Container header={<Header variant="h2">Sign in to AWS Route 53 Clone</Header>}>
               <SpaceBetween direction="vertical" size="l">
                 {error && (
-                  <Alert type="error" header="Sign in failed">
+                  <Alert key="error-alert" type="error" header="Sign in failed">
                     {error}
                   </Alert>
                 )}
-                <FormField label="Email address">
+                <FormField key="email-field" label="Email address">
                   <Input
                     value={email}
                     onChange={({ detail }) => setEmail(detail.value)}
@@ -77,7 +77,7 @@ export default function LoginPage() {
                     placeholder="user@example.com"
                   />
                 </FormField>
-                <FormField label="Password">
+                <FormField key="password-field" label="Password">
                   <Input
                     value={password}
                     onChange={({ detail }) => setPassword(detail.value)}

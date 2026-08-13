@@ -59,18 +59,18 @@ export default function SignupPage() {
             <Container header={<Header variant="h2">Create a new account</Header>}>
               <SpaceBetween direction="vertical" size="l">
                 {error && (
-                  <Alert type="error" header="Signup failed">
+                  <Alert key="error-alert" type="error" header="Signup failed">
                     {error}
                   </Alert>
                 )}
-                <FormField label="Full Name">
+                <FormField key="name-field" label="Full Name">
                   <Input
                     value={name}
                     onChange={({ detail }) => setName(detail.value)}
                     placeholder="John Doe"
                   />
                 </FormField>
-                <FormField label="Email address">
+                <FormField key="email-field" label="Email address">
                   <Input
                     value={email}
                     onChange={({ detail }) => setEmail(detail.value)}
@@ -78,7 +78,7 @@ export default function SignupPage() {
                     placeholder="user@example.com"
                   />
                 </FormField>
-                <FormField label="Password">
+                <FormField key="password-field" label="Password">
                   <Input
                     value={password}
                     onChange={({ detail }) => setPassword(detail.value)}
