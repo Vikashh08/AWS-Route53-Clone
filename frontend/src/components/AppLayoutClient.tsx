@@ -11,6 +11,15 @@ export default function AppLayoutClient({ children }: { children: React.ReactNod
   const pathname = usePathname();
   const isAuthPage = pathname === '/login' || pathname === '/register';
   const { notifications } = useNotification();
+  const [isMounted, setIsMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  if (!isMounted) {
+    return null; // Avoid Hydration mismatch from Cloudscape AppLayout
+  }
 
   if (isAuthPage) {
     return <>{children}</>;
