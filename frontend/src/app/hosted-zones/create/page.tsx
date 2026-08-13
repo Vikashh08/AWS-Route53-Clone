@@ -15,10 +15,13 @@ import Alert from '@cloudscape-design/components/alert';
 import { useRouter } from 'next/navigation';
 import api from '../../../lib/api';
 import { useNotification } from '../../../contexts/NotificationContext';
+import { SelectProps } from '@cloudscape-design/components/select';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function CreateHostedZonePage() {
   const router = useRouter();
   const { addNotification } = useNotification();
+  const queryClient = useQueryClient();
   const [domainName, setDomainName] = useState('');
   const [description, setDescription] = useState('');
   const [type, setType] = useState('Public');
@@ -40,6 +43,7 @@ export default function CreateHostedZonePage() {
         type: 'success',
         content: `Hosted zone ${domainName} created successfully.`,
       });
+      await queryClient.invalidateQueries({ queryKey: ['hosted-zones'] });
       router.push('/hosted-zones');
     } catch (err: any) {
       setError(err.response?.data?.detail || 'An error occurred while creating the hosted zone');

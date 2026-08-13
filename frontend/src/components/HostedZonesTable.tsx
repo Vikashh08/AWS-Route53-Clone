@@ -141,6 +141,12 @@ export default function HostedZonesTable() {
               >
                 Delete zone
               </Button>
+              <Button 
+                disabled={selectedItems.length === 0} 
+                onClick={() => router.push(`/hosted-zones/edit/${selectedItems[0].id}`)}
+              >
+                Edit zone
+              </Button>
               <Button variant="primary" onClick={() => router.push('/hosted-zones/create')}>Create hosted zone</Button>
             </SpaceBetween>
           }

@@ -16,12 +16,14 @@ import { useRouter, useParams } from 'next/navigation';
 import api from '../../../../lib/api';
 import { useNotification } from '../../../../contexts/NotificationContext';
 import { SelectProps } from '@cloudscape-design/components/select';
+import { useQueryClient } from '@tanstack/react-query';
 
 export default function CreateRecordPage() {
   const router = useRouter();
   const params = useParams();
   const zoneId = params.zoneId as string;
   const { addNotification } = useNotification();
+  const queryClient = useQueryClient();
   const [recordName, setRecordName] = useState('');
   const [recordType, setRecordType] = useState<SelectProps.Option>({ label: 'A - Routes traffic to an IPv4 address', value: 'A' });
   const [value, setValue] = useState('');
@@ -48,6 +50,7 @@ export default function CreateRecordPage() {
         type: 'success',
         content: `Record ${recordName || '@'} created successfully.`,
       });
+      await queryClient.invalidateQueries({ queryKey: ['dns-records', zoneId] });
       router.push(`/hosted-zones/${zoneId}`);
     } catch (err: any) {
       // Backend returns validation errors in detail array or string

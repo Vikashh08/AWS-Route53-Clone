@@ -17,6 +17,7 @@ import { useRouter, useParams } from 'next/navigation';
 import api from '../../../../../lib/api';
 import { useNotification } from '../../../../../contexts/NotificationContext';
 import { SelectProps } from '@cloudscape-design/components/select';
+import { useQueryClient } from '@tanstack/react-query';
 
 const RECORD_TYPES = [
   { label: 'A - Routes traffic to an IPv4 address', value: 'A' },
@@ -43,6 +44,7 @@ export default function EditRecordPage() {
   const zoneId = params.zoneId as string;
   const recordId = params.recordId as string;
   const { addNotification } = useNotification();
+  const queryClient = useQueryClient();
   
   const [recordName, setRecordName] = useState('');
   const [recordType, setRecordType] = useState<SelectProps.Option>(RECORD_TYPES[0]);
@@ -87,6 +89,11 @@ export default function EditRecordPage() {
         ttl: parseInt(ttl, 10),
         routing_policy: routingPolicy.value
       });
+      addNotification({
+        type: 'success',
+        content: `Record ${recordName || '@'} updated successfully.`,
+      });
+      await queryClient.invalidateQueries({ queryKey: ['dns-records', zoneId] });
       router.push(`/hosted-zones/${zoneId}`);
     } catch (err: any) {
       const detail = err.response?.data?.detail;
