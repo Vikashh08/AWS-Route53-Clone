@@ -14,11 +14,11 @@ const NotificationContext = createContext<NotificationContextType | undefined>(u
 export function NotificationProvider({ children }: { children: ReactNode }) {
   const [notifications, setNotifications] = useState<FlashbarProps.MessageDefinition[]>([]);
 
-  const addNotification = (notification: Omit<FlashbarProps.MessageDefinition, 'id'>) => {
-    const id = Math.random().toString(36).substring(7);
+  const addNotification = React.useCallback((notification: Omit<FlashbarProps.MessageDefinition, 'id'>) => {
+    const id = Date.now().toString(36) + Math.random().toString(36).substring(7);
     const newNotification = { ...notification, id, onDismiss: () => removeNotification(id), dismissible: true };
     setNotifications(prev => [...prev, newNotification]);
-  };
+  }, []);
 
   const removeNotification = (id: string) => {
     setNotifications(prev => prev.filter(n => n.id !== id));

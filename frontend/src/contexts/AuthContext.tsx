@@ -36,6 +36,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         const { data } = await api.get<{ data: User }>('/auth/me');
         setUser(data.data);
       } catch (error) {
+        // Ignored intentionally
         setUser(null);
       } finally {
         setLoading(false);

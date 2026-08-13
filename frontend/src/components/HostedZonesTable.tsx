@@ -117,7 +117,7 @@ export default function HostedZonesTable() {
         <Box textAlign="center" color="inherit">
           <b>No hosted zones</b>
           <Box padding={{ bottom: 's' }} variant="p" color="inherit">
-            You don't have any hosted zones yet.
+            You don&apos;t have any hosted zones yet.
           </Box>
           <Button onClick={() => router.push('/hosted-zones/create')}>Create hosted zone</Button>
         </Box>
